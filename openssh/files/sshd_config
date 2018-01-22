@@ -37,7 +37,7 @@ LogLevel INFO
 LoginGraceTime 120
 
 # FIXME: PermitRootLogin its not boolean variable! need to be refactored!
-PermitRootLogin {%- if server.get('permit_root_login', False) %}yes{%- else %}no{%- endif %}
+PermitRootLogin {% if server.get('permit_root_login', False) %}yes{% else %}no{% endif %}
 
 StrictModes yes
 
@@ -78,7 +78,7 @@ IgnoreRhosts yes
 RhostsRSAAuthentication no
 # similar for protocol version 2
 
-HostbasedAuthentication {%- if server.get('host_auth', False) %}yes{%- else %}no{%- endif %}
+HostbasedAuthentication {% if server.get('host_auth', False) %}yes{% else %}no{% endif %}
 
 # Uncomment if you don't trust ~/.ssh/known_hosts for RhostsRSAAuthentication
 #IgnoreUserKnownHosts yes
@@ -91,7 +91,7 @@ PermitEmptyPasswords no
 ChallengeResponseAuthentication no
 
 # Change to no to disable tunnelled clear text passwords
-PasswordAuthentication {%- if server.get('password_auth', True) %}yes{%- else %}no{%- endif %}
+PasswordAuthentication {% if server.get('password_auth', True) %}yes{% else %}no{% endif %}
 
 # Kerberos options
 {%- if server.get('kerberos_auth', False) %}
@@ -114,10 +114,10 @@ GSSAPIAuthentication no
 {%- if server.use_dns is defined %}
 UseDNS {{ server.use_dns }}
 {%- endif %}
-X11Forwarding {%- if server.get('x11', {}).get('forwarding', True) %}yes{%- else %}no{%- endif %}
+X11Forwarding {% if server.get('x11', {}).get('forwarding', True) %}yes{% else %}no{% endif %}
 X11DisplayOffset {{ server.get('x11', {}).get('display_offset', '10') }}
-PrintMotd {%- if server.get('print_motd', False) %}yes{%- else %}no{%- endif %}
-PrintLastLog {%- if server.get('print_lastlog', True) %}yes{%- else %}no{%- endif %}
+PrintMotd {% if server.get('print_motd', False) %}yes{% else %}no{% endif %}
+PrintLastLog {% if server.get('print_lastlog', True) %}yes{% else %}no{% endif %}
 TCPKeepAlive {{ server.get('alive', {}).get('keep','yes') }}
 #UseLogin no
 
