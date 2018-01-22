@@ -37,18 +37,18 @@ LogLevel INFO
 LoginGraceTime 120
 
 # FIXME: PermitRootLogin its not boolean variable! need to be refactored!
-PermitRootLogin {% if server.get('permit_root_login', False) %}yes{% else %}no{% endif %}
+PermitRootLogin {%- if server.get('permit_root_login', False) %}yes{%- else %}no{%- endif %}
 
 StrictModes yes
 
 RSAAuthentication yes
 
-PubkeyAuthentication {% if server.get('public_key_auth', True) %}yes{% else %}no{% endif %}
+PubkeyAuthentication {%- if server.get('public_key_auth', True) %}yes{%- else %}no{%- endif %}
 AuthorizedKeysFile     %h/.ssh/authorized_keys
 
 {%- if server.authorized_keys_command is defined %}
 AuthorizedKeysCommand {{ server.authorized_keys_command.command }}
-{% if (grains['os_family'] == 'RedHat' and grains['osmajorrelease'] != '6') or grains['os_family'] != 'RedHat' %}
+{%- if (grains['os_family'] == 'RedHat' and grains['osmajorrelease'] != '6') or grains['os_family'] != 'RedHat' %}
 {%- if server.authorized_keys_command.user is defined %}
 AuthorizedKeysCommandUser {{ server.authorized_keys_command.get('User', 'nobody') }}
 {%- endif %}
@@ -59,18 +59,18 @@ AuthorizedKeysCommandUser {{ server.authorized_keys_command.get('User', 'nobody'
 ForceCommand {{ server.force_command }}
 {%- endif %}
 
-{% if server.get('deny_users', False) %}
+{%- if server.get('deny_users', False) %}
 DenyUsers {{ server.deny_users|join(' ') }}
-{% endif %}
-{% if server.get('allow_users', False) %}
+{%- endif %}
+{%- if server.get('allow_users', False) %}
 AllowUsers {{ server.allow_users|join(' ') }}
-{% endif %}
-{% if server.get('deny_groups', False) %}
+{%- endif %}
+{%- if server.get('deny_groups', False) %}
 DenyGroups {{ server.deny_groups|join(' ') }}
-{% endif %}
-{% if server.get('allow_groups', False) %}
+{%- endif %}
+{%- if server.get('allow_groups', False) %}
 AllowGroups {{ server.allow_groups|join(' ') }}
-{% endif %}
+{%- endif %}
 
 # Don't read the user's ~/.rhosts and ~/.shosts files
 IgnoreRhosts yes
@@ -78,7 +78,7 @@ IgnoreRhosts yes
 RhostsRSAAuthentication no
 # similar for protocol version 2
 
-HostbasedAuthentication {% if server.get('host_auth', False) %}yes{% else %}no{% endif %}
+HostbasedAuthentication {%- if server.get('host_auth', False) %}yes{%- else %}no{%- endif %}
 
 # Uncomment if you don't trust ~/.ssh/known_hosts for RhostsRSAAuthentication
 #IgnoreUserKnownHosts yes
@@ -91,7 +91,7 @@ PermitEmptyPasswords no
 ChallengeResponseAuthentication no
 
 # Change to no to disable tunnelled clear text passwords
-PasswordAuthentication {% if server.get('password_auth', True) %}yes{% else %}no{% endif %}
+PasswordAuthentication {%- if server.get('password_auth', True) %}yes{%- else %}no{%- endif %}
 
 # Kerberos options
 {%- if server.get('kerberos_auth', False) %}
@@ -114,19 +114,19 @@ GSSAPIAuthentication no
 {%- if server.use_dns is defined %}
 UseDNS {{ server.use_dns }}
 {%- endif %}
-X11Forwarding {% if server.get('x11', {}).get('forwarding', True) %}yes{% else %}no{% endif %}
+X11Forwarding {%- if server.get('x11', {}).get('forwarding', True) %}yes{%- else %}no{%- endif %}
 X11DisplayOffset {{ server.get('x11', {}).get('display_offset', '10') }}
-PrintMotd {% if server.get('print_motd', False) %}yes{% else %}no{% endif %}
-PrintLastLog {% if server.get('print_lastlog', True) %}yes{% else %}no{% endif %}
+PrintMotd {%- if server.get('print_motd', False) %}yes{%- else %}no{%- endif %}
+PrintLastLog {%- if server.get('print_lastlog', True) %}yes{%- else %}no{%- endif %}
 TCPKeepAlive {{ server.get('alive', {}).get('keep','yes') }}
 #UseLogin no
 
 {%- if server.get('alive', {'interval': None}).interval is number %}
 ClientAliveInterval {{ server.alive.interval }}
-{% endif %}
+{%- endif %}
 {%- if server.get('alive', {'count': None}).count is number %}
 ClientAliveCountMax {{ server.alive.count }}
-{% endif %}
+{%- endif %}
 
 {%- if server.max_sessions is defined %}
 MaxSessions {{ server.max_sessions }}
