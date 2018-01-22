@@ -43,7 +43,7 @@ StrictModes yes
 
 RSAAuthentication yes
 
-PubkeyAuthentication {%- if server.get('public_key_auth', True) %}yes{%- else %}no{%- endif %}
+PubkeyAuthentication {% if server.get('public_key_auth', True) %}yes{% else %}no{% endif %}
 AuthorizedKeysFile     %h/.ssh/authorized_keys
 
 {%- if server.authorized_keys_command is defined %}
