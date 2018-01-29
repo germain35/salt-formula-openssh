@@ -23,7 +23,7 @@ HostKey /etc/ssh/ssh_host_dsa_key
 HostKey /etc/ssh/ssh_host_ecdsa_key
 {%- endif %}
 #Privilege Separation is turned on for security
-UsePrivilegeSeparation yes
+UsePrivilegeSeparation {% if server.get('privilege_separation', True) %}{{server.privilege_separation}}{% else %}no{% endif %}
 
 # Lifetime and size of ephemeral version 1 server key
 KeyRegenerationInterval 3600
@@ -37,7 +37,7 @@ LogLevel INFO
 LoginGraceTime 120
 
 # FIXME: PermitRootLogin its not boolean variable! need to be refactored!
-PermitRootLogin {% if server.get('permit_root_login', False) %}yes{% else %}no{% endif %}
+PermitRootLogin {% if server.get('permit_root_login', False) %}{{server.permit_root_login}}{% else %}no{% endif %}
 
 StrictModes yes
 
@@ -118,6 +118,7 @@ X11Forwarding {% if server.get('x11', {}).get('forwarding', True) %}yes{% else %
 X11DisplayOffset {{ server.get('x11', {}).get('display_offset', '10') }}
 PrintMotd {% if server.get('print_motd', False) %}yes{% else %}no{% endif %}
 PrintLastLog {% if server.get('print_lastlog', True) %}yes{% else %}no{% endif %}
+AllowTcpForwarding {% if server.get('tcp_forwarding', True) %}yes{% else %}no{% endif %}
 TCPKeepAlive {{ server.get('alive', {}).get('keep','yes') }}
 #UseLogin no
 
