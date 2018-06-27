@@ -1,1 +1,1 @@
-{% from "openssh/map.jinja" import server with context %}{{ server.banner }}
+{% from "openssh/map.jinja" import openssh with context %}{{ openssh.server.banner }}

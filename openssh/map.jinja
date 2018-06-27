@@ -1,53 +1,92 @@
-{% set server = salt['grains.filter_by']({
+# -*- coding: utf-8 -*-
+# vim: ft=jinja
+
+{%- set os         = salt['grains.get']('os') %}
+{%- set osrelease  = salt['grains.get']('osrelease') %}
+{%- set oscodename = salt['grains.get']('oscodename') %}
+
+{## Start with defaults from defaults.yaml ##}
+{% import_yaml 'openssh/defaults.yaml' as default_settings %}
+
+{##
+Setup variables using grains['os_family'] based logic, only add key:values
+that differ from what is in defaults.yaml
+##}
+{% set family_map = salt['grains.filter_by']({
     'Arch': {
         'pkgs': ['openssh'],
+    },
+    'Debian': {
+        'pkgs': ['openssh-server'],
+    },
+    'MacOS': {
+        'pkgs': ['openssh'],
+    },
+    'RedHat': {
+        'pkgs': ['openssh'],
+    },
+}
+, grain="os_family"
+, merge=salt['pillar.get']('openssh:lookup')
+, default='Debian') %}
+
+{% set server_family_map = salt['grains.filter_by']({
+    'Arch': {
         'service': 'sshd',
         'config': '/etc/ssh/sshd_config',
         'lib_dir': '/usr/lib/openssh',
         'user': {},
     },
     'Debian': {
-        'pkgs': ['openssh-server'],
         'service': 'ssh',
         'config': '/etc/ssh/sshd_config',
         'lib_dir': '/usr/lib/openssh',
         'user': {},
     },
     'MacOS': {
-        'pkgs': ['openssh'],
         'service': 'ssh',
         'config': '/etc/sshd_config',
         'lib_dir': '/usr/lib/openssh',
         'user': {},
     },
     'RedHat': {
-        'pkgs': ['openssh'],
         'service': 'sshd',
         'config': '/etc/ssh/sshd_config',
         'lib_dir': '/usr/libexec/openssh',
         'user': {},
     },
-}, merge=salt['pillar.get']('openssh:server')) %}
+}
+, grain="os_family"
+, merge=salt['pillar.get']('openssh:server:lookup')
+, default='Debian') %}
 
-{% set client = salt['grains.filter_by']({
+{% set client_family_map = salt['grains.filter_by']({
     'Arch': {
-        'pkgs': ['openssh'],
-        'proxy_pkgs': ['openssh'],
         'config': '/etc/ssh/ssh_config',
     },
     'Debian': {
-        'pkgs': ['openssh-client'],
-        'proxy_pkgs': ['connect-proxy'],
         'config': '/etc/ssh/ssh_config',
     },
     'MacOS': {
-        'pkgs': ['openssh'],
-        'proxy_pkgs': ['connect-proxy'],
         'config': '/etc/ssh/ssh_config',
     },
     'RedHat': {
-        'pkgs': ['openssh-clients'],
-        'proxy_pkgs': ['connect-proxy'],
         'config': '/etc/ssh/ssh_config',
     },
-}, merge=salt['pillar.get']('openssh:client')) %}
+}
+, grain="os_family"
+, merge=salt['pillar.get']('openssh:client:lookup')
+, default='Debian') %}
+
+{## Merge the flavor_map to the default settings ##}
+{% do default_settings.openssh.update(family_map) %}
+{% do default_settings.openssh.server.update(server_family_map) %}
+{% do default_settings.openssh.client.update(client_family_map) %}
+
+{## Merge in supervisor:lookup pillar ##}
+{% set openssh = salt['pillar.get'](
+        'openssh',
+        default=default_settings.openssh,
+        merge=True
+    )
+%}

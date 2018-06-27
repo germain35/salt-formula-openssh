@@ -1,10 +1,9 @@
 {%- from "openssh/map.jinja" import client with context %}
-{%- if client.enabled %}
 
 include:
-- openssh.client.service
+  - openssh.client.service
 
-{%- for xxx, user in client.get('user', {}).iteritems() %}
+{%- for xxx, user in client.get('user', {}).items() %}
 
 {%- if user.private_key is defined %}
 
@@ -35,5 +34,3 @@ include:
 {%- endif %}
 
 {%- endfor %}
-
-{%- endif %}

@@ -1,8 +1,11 @@
 
+{%- from "openssh/map.jinja" import openssh with context %}
+
 include:
-{% if pillar.openssh.server is defined %}
-- openssh.server
-{% endif %}
-{% if pillar.openssh.client is defined %}
-- openssh.client
-{% endif %}
+  - openssh.install
+  {%- if openssh.server.get('enabled', False) %}
+  - openssh.server
+  {%- endif %}
+  {%- if openssh.client.get('enabled', False) %}
+  - openssh.client
+  {%- endif %}

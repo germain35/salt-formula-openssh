@@ -1,3 +1,4 @@
 include:
-- openssh.server.service
-- openssh.server.public_key
+  - openssh.install
+  - openssh.server.service
+  - openssh.server.public_key

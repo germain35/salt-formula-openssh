@@ -1,18 +1,7 @@
 {%- from "openssh/map.jinja" import client with context %}
-{%- from "linux/map.jinja" import network with context %}
-{%- if client.enabled %}
 
-openssh_client_packages:
-  pkg.latest:
-  - names: {{ client.pkgs }}
-
-{%- if network.proxy.host != 'none' and not network.proxy.get("pkg_only", true) %}
-
-openssh_client_proxy_packages:
-  pkg.latest:
-  - names: {{ client.proxy_pkgs }}
-
-{%- endif %}
+include:
+  - openssh.install
 
 openssh_client_config:
   file.managed:
@@ -20,35 +9,33 @@ openssh_client_config:
   - user: root
   - group: root
   - source: salt://openssh/files/ssh_config
-  - mode: 600
+  - mode: 644
   - template: jinja
   - require:
-    - pkg: openssh_client_packages
+    - pkg: openssh_packages
 
-{%- for user_name, user in client.get('user', {}).iteritems() %}
+{%- for user, params in client.get('user', {}).items() %}
 
 {%- if user.get('enabled', True) %}
 
-{{ user.user.home }}/.ssh:
+{{ params.home }}/.ssh:
   file.directory:
-  - user: {{ user.user.name }}
+  - user: {{ params.name }}
   - mode: 700
   - makedirs: true
   - require:
-    - pkg: openssh_client_packages
+    - pkg: openssh_packages
 
-openssh_client_{{ user_name }}_config:
+openssh_client_{{ user }}_config:
   file.managed:
-  - name: {{ user.user.home }}/.ssh/config
-  - user: {{ user.user.name }}
+  - name: {{ params.home }}/.ssh/config
+  - user: {{ user }}
   - source: salt://openssh/files/ssh_config
   - mode: 600
   - template: jinja
   - require:
-    - pkg: openssh_client_packages
+    - pkg: openssh_packages
 
 {%- endif %}
 
 {%- endfor %}
-
-{%- endif %}

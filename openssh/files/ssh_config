@@ -1,29 +1,26 @@
-{%- from "openssh/map.jinja" import client with context %}
-{%- from "linux/map.jinja" import network with context %}
+{%- from "openssh/map.jinja" import openssh with context %}
 
 Host *
 
-    SendEnv {% if client.send_env is defined %}{{ client.send_env }}{% else %}LANG LC_*{% endif %}
-    HashKnownHosts {% if client.get('hash_known_hosts', True) %}yes{% else %}no{% endif %}
-    GSSAPIAuthentication {% if client.get('gssapi_authentication', False) %}yes{% else %}no{% endif %}
-    GSSAPIDelegateCredentials {% if client.get('gssapi_delegate_credentials', False) %}yes{% else %}no{% endif %}
-    PubkeyAuthentication {% if client.get('pubkey_authentication', True) %}yes{% else %}no{% endif %}
-    ForwardAgent {% if client.get('forward_agent', False) %}yes{% else %}no{% endif %}
+    SendEnv {% if openssh.client.send_env is defined %}{{ openssh.client.send_env }}{% else %}LANG LC_*{% endif %}
+    HashKnownHosts {% if openssh.client.get('hash_known_hosts', True) %}yes{% else %}no{% endif %}
+    GSSAPIAuthentication {% if openssh.client.get('gssapi_authentication', False) %}yes{% else %}no{% endif %}
+    GSSAPIDelegateCredentials {% if openssh.client.get('gssapi_delegate_credentials', False) %}yes{% else %}no{% endif %}
+    PubkeyAuthentication {% if openssh.client.get('pubkey_authentication', True) %}yes{% else %}no{% endif %}
+    ForwardAgent {% if openssh.client.get('forward_agent', False) %}yes{% else %}no{% endif %}
 
-    {%- if client.global_known_hosts is defined %}
-    GlobalKnownHostsFile {{ client.global_known_hosts }}
+    {%- if openssh.client.global_known_hosts is defined %}
+    GlobalKnownHostsFile {{ openssh.client.global_known_hosts }}
     {%- endif %}
 
-    {%- if client.proxy_command is defined %}
-    ProxyCommand {{ client.proxy_command }}
-    {%- elif network.proxy.host != 'none' and not network.proxy.get("pkg_only", true) %}
-    ProxyCommand connect -H {{ network.proxy.host }}:{{ network.proxy.port }} %h %p
+    {%- if openssh.client.proxy_command is defined %}
+    ProxyCommand {{ openssh.client.proxy_command }}
     {%- endif %}
-    {% if client.stricthostkeychecking is not defined %}{% else %}StrictHostKeyChecking no{% endif %}
-    {%- if client.get('alive', {'interval': None}).interval is number %}
-    ServerAliveInterval {{ client.alive.interval }}
+    {% if openssh.client.stricthostkeychecking is not defined %}{% else %}StrictHostKeyChecking no{% endif %}
+    {%- if openssh.client.get('alive', {'interval': None}).interval is number %}
+    ServerAliveInterval {{ openssh.client.alive.interval }}
     {% endif %}
-    {%- if client.get('alive', {'count': None}).count is number %}
-    ServerAliveCountMax {{ client.alive.count }}
+    {%- if openssh.client.get('alive', {'count': None}).count is number %}
+    ServerAliveCountMax {{ openssh.client.alive.count }}
     {% endif %}
 

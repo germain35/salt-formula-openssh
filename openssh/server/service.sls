@@ -1,11 +1,9 @@
-{%- from "openssh/map.jinja" import server with context %}
-{%- if server.enabled %}
+{%- from "openssh/map.jinja" import openssh with context %}
 
-openssh_server_packages:
-  pkg.latest:
-  - names: {{ server.pkgs }}
+include:
+  - openssh.install
 
-{%- if server.banner is defined %}
+{%- if openssh.server.banner is defined %}
 
 /etc/banner:
   file.managed:
@@ -15,7 +13,7 @@ openssh_server_packages:
   - mode: 644
   - template: jinja
   - require:
-    - pkg: openssh_server_packages
+    - pkg: openssh_packages
   - watch_in:
     - service: openssh_server_service
 
@@ -23,19 +21,18 @@ openssh_server_packages:
 
 openssh_server_config:
   file.managed:
-  - name: {{ server.config }}
+  - name: {{ openssh.server.config }}
   - user: root
   - group: root
   - source: salt://openssh/files/sshd_config
   - mode: 600
   - template: jinja
   - require:
-    - pkg: openssh_server_packages
+    - pkg: openssh_packages
 
 openssh_server_service:
   service.running:
-  - name: {{ server.service }}
+  - name: {{ openssh.server.service }}
+  - enable: {{ openssh.server.service_enabled }}
   - watch:
     - file: openssh_server_config
-
-{%- endif %}
