@@ -1,11 +1,10 @@
 openssh:
   server:
     service_enabled: True
-    port:
-      - 22
-    listenaddress:
-      - 0.0.0.0
-    privilege_separation: 'yes'
+    bind: 
+      address: 0.0.0.0
+      port: 22
+    privilege_separation: True
     key_regeneration_interval: 3600
     permit_root_login: 'prohibit-password'
     public_key_auth: True
